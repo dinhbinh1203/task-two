@@ -71,9 +71,6 @@ const Home = () => {
     const result = listWard.filter(
       (ward) => ward.parent_code === selectDistrict,
     );
-    console.log('listWard.parent_code', listWard.parent_code);
-    console.log('selectDistrict', selectDistrict);
-    console.log('result', result);
     setListWard(result);
   };
 
@@ -81,7 +78,7 @@ const Home = () => {
     setSelectCity(option.compare);
     setListDistrict();
     setListWard();
-    console.log('option', option);
+
     form.setFieldValue(['travel', name, 'district'], null);
     form.setFieldValue(['travel', name, 'ward'], null);
   };
