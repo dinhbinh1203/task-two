@@ -58,6 +58,7 @@ const Home = () => {
         <Card
           title="ĐĂNG KÝ"
           justify="center"
+          align="middle"
           bordered={false}
           style={{
             width: 800,
@@ -142,7 +143,14 @@ const Home = () => {
               </Form.List>
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
