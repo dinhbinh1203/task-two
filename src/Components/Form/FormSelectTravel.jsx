@@ -9,6 +9,25 @@ import { Form, Select, Row, Col } from 'antd';
 const { Option } = Select;
 
 const FormSelectTravel = ({ name, form, remove, fields }) => {
+  const checkAddressExactly = (name) => {
+    let i;
+    for (i = 0; i < fields.length; i++) {
+      if (
+        name !== i &&
+        // eslint-disable-next-line no-self-compare
+        form.getFieldValue(['travel', i, 'city']) ===
+          form.getFieldValue(['travel', name, 'city']) &&
+        form.getFieldValue(['travel', i, 'district']) ===
+          form.getFieldValue(['travel', name, 'district']) &&
+        form.getFieldValue(['travel', i, 'ward']) ===
+          form.getFieldValue(['travel', name, 'ward'])
+      ) {
+        return false;
+      }
+      return true;
+    }
+  };
+
   const [listDistrict, setListDistrict] = useState();
   const [listWard, setListWard] = useState();
 
@@ -106,15 +125,14 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
               required: true,
               message: 'Vui lòng phường/xã',
             },
-            ({ getFieldValue }) => ({
+            () => ({
               validator(_, value) {
-                if (
-                  !value ||
-                  getFieldValue(['travel', name, 'district']) !== value
-                ) {
+                if (checkAddressExactly(name)) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('Địa chỉ không hợp lệ!'));
+                return Promise.reject(
+                  new Error('Địa chỉ không được giống nhau'),
+                );
               },
             }),
           ]}

@@ -44,6 +44,8 @@ const Home = () => {
     }
   };
 
+  console.log(form.getFieldValue('travel'));
+
   return (
     <div
       className="site-card-border-less-wrapper"
