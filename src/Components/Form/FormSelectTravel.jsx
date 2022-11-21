@@ -4,53 +4,44 @@ import cities from 'hanhchinhvn/dist/tinh_tp.json';
 import districts from 'hanhchinhvn/dist/quan_huyen.json';
 import wards from 'hanhchinhvn/dist/xa_phuong.json';
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Form, Space, Select } from 'antd';
+import { Form, Select, Row, Col } from 'antd';
 
 const { Option } = Select;
 
-const FormSelectTravel = ({ name, restField, form, remove }) => {
+const FormSelectTravel = ({ name, form, remove, fields }) => {
   const [listDistrict, setListDistrict] = useState();
   const [listWard, setListWard] = useState();
-  const [selectCity, setSelectCity] = useState();
-  const [selectDistrict, setSelectDistrict] = useState();
 
-  const onCallApiDistrict = () => {
+  const onCallApiDistrict = (city) => {
     const listDistrict = Object.values(districts);
     const result = listDistrict.filter(
-      (district) => district.parent_code === selectCity,
+      (district) => district.parent_code === city,
     );
 
     setListDistrict(result);
   };
 
-  const onCallApiWard = () => {
+  const onCallApiWard = (district) => {
     const listWard = Object.values(wards);
-    const result = listWard.filter(
-      (ward) => ward.parent_code === selectDistrict,
-    );
+    const result = listWard.filter((ward) => ward.parent_code === district);
     setListWard(result);
   };
 
   const handleCityChange = (value, option, name) => {
-    setSelectCity(option.compare);
-    setListDistrict();
-    setListWard();
-
     form.setFieldValue(['travel', name, 'district'], null);
     form.setFieldValue(['travel', name, 'ward'], null);
+    onCallApiDistrict(option.compare);
   };
 
   const handleDistrictChange = (value, option, name) => {
-    setSelectDistrict(option.compare);
-    setListWard();
     form.setFieldValue(['travel', name, 'ward'], null);
+    onCallApiWard(option.compare);
   };
 
   return (
-    <>
-      <Space style={{ display: 'flex', marginBottom: 1 }} align="baseline">
+    <Row gutter={16}>
+      <Col span={7}>
         <Form.Item
-          {...restField}
           name={[name, 'city']}
           rules={[
             {
@@ -60,6 +51,8 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
           ]}
         >
           <Select
+            justify="start"
+            align="start"
             showSearch
             placeholder="Tỉnh/Thành phố"
             onChange={(value, option) => handleCityChange(value, option, name)}
@@ -71,7 +64,9 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
             ))}
           </Select>
         </Form.Item>
+      </Col>
 
+      <Col span={7}>
         <Form.Item
           dependencies={['city']}
           name={[name, 'district']}
@@ -83,12 +78,13 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
           ]}
         >
           <Select
+            justify="start"
+            align="start"
             showSearch
             placeholder="Quận/Huyện"
             onChange={(value, option) =>
               handleDistrictChange(value, option, name)
             }
-            onDropdownVisibleChange={onCallApiDistrict}
             disabled={!form.getFieldValue(['travel', name, 'city'])}
           >
             {listDistrict !== undefined &&
@@ -99,7 +95,9 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
               ))}
           </Select>
         </Form.Item>
+      </Col>
 
+      <Col span={7}>
         <Form.Item
           dependencies={['district']}
           name={[name, 'ward']}
@@ -108,12 +106,24 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
               required: true,
               message: 'Vui lòng phường/xã',
             },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (
+                  !value ||
+                  getFieldValue(['travel', name, 'district']) !== value
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('Địa chỉ không hợp lệ!'));
+              },
+            }),
           ]}
         >
           <Select
+            justify="start"
+            align="start"
             showSearch
             placeholder="Phường/xã"
-            onDropdownVisibleChange={onCallApiWard}
             disabled={!form.getFieldValue(['travel', name, 'district'])}
           >
             {listWard !== undefined &&
@@ -124,9 +134,14 @@ const FormSelectTravel = ({ name, restField, form, remove }) => {
               ))}
           </Select>
         </Form.Item>
-        {name !== 0 && <MinusCircleOutlined onClick={() => remove(name)} />}
-      </Space>
-    </>
+      </Col>
+
+      <Col span={3}>
+        {fields.length > 1 && (
+          <MinusCircleOutlined onClick={() => remove(name)} />
+        )}
+      </Col>
+    </Row>
   );
 };
 

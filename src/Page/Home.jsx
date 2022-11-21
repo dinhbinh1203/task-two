@@ -33,11 +33,15 @@ const Home = () => {
     console.log('Received values of form: ', values);
   };
 
-  const handleChangeDayOfBirth = (value) => {
-    const yearCurrent = Number(moment().format('YYYY'));
-    const yearBirthDay = Number(value.format('YYYY'));
-    const age = yearCurrent - yearBirthDay;
-    form.setFieldValue('age', age);
+  const handleChangeDateOfBirth = (value) => {
+    if (value !== null) {
+      const yearCurrent = Number(moment().format('YYYY'));
+      const yearBirthDay = Number(value.format('YYYY'));
+      const age = yearCurrent - yearBirthDay;
+      form.setFieldValue('age', age);
+    } else {
+      form.setFieldValue('age', null);
+    }
   };
 
   return (
@@ -88,7 +92,10 @@ const Home = () => {
             >
               <DatePicker
                 disabledDate={disabledDate}
-                onChange={(value) => handleChangeDayOfBirth(value)}
+                onChange={(value) => handleChangeDateOfBirth(value)}
+                style={{
+                  width: '100%',
+                }}
               />
             </Form.Item>
 
@@ -118,13 +125,13 @@ const Home = () => {
                 {(fields, { add, remove }) => {
                   return (
                     <>
-                      {fields.map(({ key, name, ...restField }) => (
+                      {fields.map(({ key, name }) => (
                         <FormSelectTravel
                           key={name}
                           name={name}
-                          restField={restField}
                           form={form}
                           remove={remove}
+                          fields={fields}
                         />
                       ))}
                       <Form.Item>
