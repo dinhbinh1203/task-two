@@ -37,11 +37,15 @@ const filterOption = (inputValue, option) => {
 };
 
 const FormSelectTravel = ({ name, form, remove, fields }) => {
+  // console.log('field', fields);
+
   const checkAddressExactly = (name) => {
-    let i;
-    for (i = 0; i < fields.length; i++) {
+    console.log('check');
+
+    for (let i = 0; i < fields.length; i++) {
       if (
         name !== i &&
+        form.getFieldValue(['travel', name, 'ward']) !== undefined &&
         // eslint-disable-next-line no-self-compare
         form.getFieldValue(['travel', i, 'city']) ===
           form.getFieldValue(['travel', name, 'city']) &&
@@ -83,6 +87,11 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
   const handleDistrictChange = (value, option, name) => {
     form.setFieldValue(['travel', name, 'ward'], null);
     onCallApiWard(option.compare);
+  };
+
+  const handleRemove = () => {
+    remove(name);
+    console.log('ward', form.getFieldValue(['travel', name, 'ward']));
   };
 
   return (
@@ -148,15 +157,19 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
 
       <Col span={7}>
         <Form.Item
-          dependencies={['district', 'travel']}
+          // dependencies={['travel']}
           name={[name, 'ward']}
           rules={[
-            {
-              required: true,
-              message: 'Vui lòng phường/xã',
-            },
-            () => ({
+            ({ getFieldValue }) => ({
               validator(_, value) {
+                if (
+                  getFieldValue(['travel', name, 'city']) &&
+                  getFieldValue(['travel', name, 'district']) &&
+                  value === undefined
+                ) {
+                  return Promise.reject(new Error('Vui long nhập phường xã'));
+                }
+
                 if (checkAddressExactly(name)) {
                   return Promise.resolve();
                 }
@@ -186,12 +199,12 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
       </Col>
 
       <Col span={3}>
-        {fields.length > 1 && (
-          <MinusCircleOutlined onClick={() => remove(name)} />
-        )}
+        {fields.length > 1 && <MinusCircleOutlined onClick={handleRemove} />}
       </Col>
     </Row>
   );
 };
 
 export default FormSelectTravel;
+
+// <MinusCircleOutlined onClick={() => remove(name)} />

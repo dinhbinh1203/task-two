@@ -44,7 +44,18 @@ const Home = () => {
     }
   };
 
-  console.log(form.getFieldValue('travel'));
+  const onValuesChangeForm = (changedValues, allValues) => {
+    const valueChange = Object.getOwnPropertyNames(changedValues)[0];
+
+    if (valueChange === 'travel') {
+      let arr = [];
+      for (let i = 0; i < allValues.travel.length; i++) {
+        arr.push(['travel', i, 'ward']);
+      }
+
+      form.validateFields(arr);
+    }
+  };
 
   return (
     <div
@@ -78,6 +89,7 @@ const Home = () => {
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
+            onValuesChange={onValuesChangeForm}
           >
             <Form.Item
               name="username"
