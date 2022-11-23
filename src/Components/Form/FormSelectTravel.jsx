@@ -37,11 +37,8 @@ const filterOption = (inputValue, option) => {
 };
 
 const FormSelectTravel = ({ name, form, remove, fields }) => {
-  // console.log('field', fields);
-
   const checkAddressExactly = (name) => {
-    console.log('check');
-
+    console.log('error', form.getFieldError(['travel']));
     for (let i = 0; i < fields.length; i++) {
       if (
         name !== i &&
@@ -79,19 +76,18 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
   };
 
   const handleCityChange = (value, option, name) => {
-    form.setFieldValue(['travel', name, 'district'], null);
-    form.setFieldValue(['travel', name, 'ward'], null);
+    form.setFieldValue(['travel', name, 'district'], undefined);
+    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiDistrict(option.compare);
   };
 
   const handleDistrictChange = (value, option, name) => {
-    form.setFieldValue(['travel', name, 'ward'], null);
+    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiWard(option.compare);
   };
 
   const handleRemove = () => {
     remove(name);
-    console.log('ward', form.getFieldValue(['travel', name, 'ward']));
   };
 
   return (
@@ -157,18 +153,16 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
 
       <Col span={7}>
         <Form.Item
-          // dependencies={['travel']}
+          dependencies={['district']}
           name={[name, 'ward']}
           rules={[
-            ({ getFieldValue }) => ({
+            {
+              required: true,
+              message: 'Vui lòng nhập phường xã',
+            },
+            () => ({
               validator(_, value) {
-                if (
-                  getFieldValue(['travel', name, 'city']) &&
-                  getFieldValue(['travel', name, 'district']) &&
-                  value === undefined
-                ) {
-                  return Promise.reject(new Error('Vui long nhập phường xã'));
-                }
+                // value = form.getFieldValue(['travel', name, 'ward']);
 
                 if (checkAddressExactly(name)) {
                   return Promise.resolve();

@@ -45,14 +45,22 @@ const Home = () => {
   };
 
   const onValuesChangeForm = (changedValues, allValues) => {
+    let arr = [];
+    form.validateFields(arr);
     const valueChange = Object.getOwnPropertyNames(changedValues)[0];
 
     if (valueChange === 'travel') {
-      let arr = [];
       for (let i = 0; i < allValues.travel.length; i++) {
-        arr.push(['travel', i, 'ward']);
+        let isWardTouched = form.isFieldTouched(['travel', i, 'ward']);
+        if (
+          // isWardTouched &&
+          form.getFieldValue(['travel', i, 'ward']) !== undefined
+        ) {
+          arr.push(['travel', i, 'ward']);
+        }
+        // arr.push(['travel', i, 'ward']);
       }
-
+      console.log('arr', arr);
       form.validateFields(arr);
     }
   };
