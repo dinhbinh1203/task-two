@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import '../index.css';
 import { Button, DatePicker, Form, Input, Row, Card } from 'antd';
@@ -44,24 +44,37 @@ const Home = () => {
     }
   };
 
+  const [checkSubmit, setCheckSubmit] = useState(false);
+
+  const onClickSubmit = () => {
+    setCheckSubmit(true);
+  };
+
   const onValuesChangeForm = (changedValues, allValues) => {
-    let arr = [];
-    form.validateFields(arr);
+    let arrWard = [];
     const valueChange = Object.getOwnPropertyNames(changedValues)[0];
 
     if (valueChange === 'travel') {
       for (let i = 0; i < allValues.travel.length; i++) {
-        let isWardTouched = form.isFieldTouched(['travel', i, 'ward']);
-        if (
-          // isWardTouched &&
-          form.getFieldValue(['travel', i, 'ward']) !== undefined
-        ) {
-          arr.push(['travel', i, 'ward']);
-        }
-        // arr.push(['travel', i, 'ward']);
+        arrWard.push(['travel', i, 'ward']);
       }
-      console.log('arr', arr);
-      form.validateFields(arr);
+      form.validateFields(arrWard);
+    }
+
+    let arrCity = [];
+    if (valueChange === 'travel') {
+      for (let i = 0; i < allValues.travel.length; i++) {
+        arrCity.push(['travel', i, 'city']);
+      }
+      form.validateFields(arrCity);
+    }
+
+    let arrDistrict = [];
+    if (valueChange === 'travel') {
+      for (let i = 0; i < allValues.travel.length; i++) {
+        arrDistrict.push(['travel', i, 'district']);
+      }
+      form.validateFields(arrDistrict);
     }
   };
 
@@ -154,6 +167,7 @@ const Home = () => {
                           form={form}
                           remove={remove}
                           fields={fields}
+                          onClickSubmit={checkSubmit}
                         />
                       ))}
                       <Form.Item>
@@ -180,7 +194,7 @@ const Home = () => {
                 justifyContent: 'center',
               }}
             >
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" onClick={onClickSubmit}>
                 Submit
               </Button>
             </Form.Item>

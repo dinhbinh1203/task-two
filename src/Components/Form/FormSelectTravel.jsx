@@ -36,9 +36,8 @@ const filterOption = (inputValue, option) => {
   );
 };
 
-const FormSelectTravel = ({ name, form, remove, fields }) => {
+const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
   const checkAddressExactly = (name) => {
-    console.log('error', form.getFieldError(['travel']));
     for (let i = 0; i < fields.length; i++) {
       if (
         name !== i &&
@@ -97,7 +96,7 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
           name={[name, 'city']}
           rules={[
             {
-              required: true,
+              required: onClickSubmit,
               message: 'Vui lòng nhập tỉnh/thành phố',
             },
           ]}
@@ -125,7 +124,7 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
           name={[name, 'district']}
           rules={[
             {
-              required: true,
+              required: onClickSubmit,
               message: 'Vui lòng nhập quận/huyện',
             },
           ]}
@@ -157,13 +156,11 @@ const FormSelectTravel = ({ name, form, remove, fields }) => {
           name={[name, 'ward']}
           rules={[
             {
-              required: true,
+              required: onClickSubmit,
               message: 'Vui lòng nhập phường xã',
             },
             () => ({
               validator(_, value) {
-                // value = form.getFieldValue(['travel', name, 'ward']);
-
                 if (checkAddressExactly(name)) {
                   return Promise.resolve();
                 }
