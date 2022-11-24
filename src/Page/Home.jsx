@@ -50,32 +50,30 @@ const Home = () => {
     setCheckSubmit(true);
   };
 
-  const onValuesChangeForm = (changedValues, allValues) => {
+  const onValuesChangeForm = (changedValues) => {
     let arrWard = [];
-    const valueChange = Object.getOwnPropertyNames(changedValues)[0];
+    const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
 
-    if (valueChange === 'travel') {
-      for (let i = 0; i < allValues.travel.length; i++) {
-        arrWard.push(['travel', i, 'ward']);
+    if (fieldChange === 'travel') {
+      console.log('allValues.travel', changedValues, changedValues.travel);
+      for (let i = 0; i < changedValues.travel.length; i++) {
+        const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
+        console.log('validate after change===========', i, isTouchedWard);
+        if (isTouchedWard) {
+          arrWard.push(['travel', i, 'ward']);
+        }
       }
+
+      console.log('arrWard', arrWard);
       form.validateFields(arrWard);
     }
+  };
 
-    let arrCity = [];
-    if (valueChange === 'travel') {
-      for (let i = 0; i < allValues.travel.length; i++) {
-        arrCity.push(['travel', i, 'city']);
-      }
-      form.validateFields(arrCity);
-    }
-
-    let arrDistrict = [];
-    if (valueChange === 'travel') {
-      for (let i = 0; i < allValues.travel.length; i++) {
-        arrDistrict.push(['travel', i, 'district']);
-      }
-      form.validateFields(arrDistrict);
-    }
+  const onFieldsChange = (changedFields, allFields) => {
+    // const travelField = changedFields[0].name[0];
+    // if (travelField === 'travel') {
+    //   console.log('fields change', changedFields, allFields);
+    // }
   };
 
   return (
@@ -111,6 +109,7 @@ const Home = () => {
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             onValuesChange={onValuesChangeForm}
+            onFieldsChange={onFieldsChange}
           >
             <Form.Item
               name="username"
@@ -160,16 +159,19 @@ const Home = () => {
                 {(fields, { add, remove }) => {
                   return (
                     <>
-                      {fields.map(({ key, name }) => (
-                        <FormSelectTravel
-                          key={name}
-                          name={name}
-                          form={form}
-                          remove={remove}
-                          fields={fields}
-                          onClickSubmit={checkSubmit}
-                        />
-                      ))}
+                      {fields.map(({ key, name }) => {
+                        return (
+                          <FormSelectTravel
+                            key={key}
+                            name={name}
+                            fieldKey={key}
+                            form={form}
+                            remove={remove}
+                            fields={fields}
+                            // checkSubmit={checkSubmit}
+                          />
+                        );
+                      })}
                       <Form.Item>
                         <Button
                           type="dashed"

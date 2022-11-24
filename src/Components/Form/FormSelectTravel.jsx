@@ -36,20 +36,22 @@ const filterOption = (inputValue, option) => {
   );
 };
 
-const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
-  const checkAddressExactly = (name) => {
+const FormSelectTravel = ({ name, form, remove, fields, fieldKey }) => {
+  const checkAddressExactly = (fieldKey) => {
     for (let i = 0; i < fields.length; i++) {
+      let { fieldKey: _fieldKey } = fields[i];
       if (
-        name !== i &&
-        form.getFieldValue(['travel', name, 'ward']) !== undefined &&
+        fieldKey !== _fieldKey &&
+        form.getFieldValue(['travel', fieldKey, 'ward']) !== undefined &&
         // eslint-disable-next-line no-self-compare
-        form.getFieldValue(['travel', i, 'city']) ===
-          form.getFieldValue(['travel', name, 'city']) &&
-        form.getFieldValue(['travel', i, 'district']) ===
-          form.getFieldValue(['travel', name, 'district']) &&
-        form.getFieldValue(['travel', i, 'ward']) ===
-          form.getFieldValue(['travel', name, 'ward'])
+        form.getFieldValue(['travel', _fieldKey, 'city']) ===
+          form.getFieldValue(['travel', fieldKey, 'city']) &&
+        form.getFieldValue(['travel', _fieldKey, 'district']) ===
+          form.getFieldValue(['travel', fieldKey, 'district']) &&
+        form.getFieldValue(['travel', _fieldKey, 'ward']) ===
+          form.getFieldValue(['travel', fieldKey, 'ward'])
       ) {
+        console.log('check exist travel', fieldKey, _fieldKey);
         return false;
       }
     }
@@ -87,6 +89,8 @@ const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
 
   const handleRemove = () => {
     remove(name);
+    console.log('onRemove', name, form.getFieldValue('travel'));
+    // form.validateFields([['travel', name, 'ward']]);
   };
 
   return (
@@ -96,7 +100,7 @@ const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
           name={[name, 'city']}
           rules={[
             {
-              required: onClickSubmit,
+              required: true,
               message: 'Vui lòng nhập tỉnh/thành phố',
             },
           ]}
@@ -124,7 +128,7 @@ const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
           name={[name, 'district']}
           rules={[
             {
-              required: onClickSubmit,
+              required: true,
               message: 'Vui lòng nhập quận/huyện',
             },
           ]}
@@ -156,12 +160,12 @@ const FormSelectTravel = ({ name, form, remove, fields, onClickSubmit }) => {
           name={[name, 'ward']}
           rules={[
             {
-              required: onClickSubmit,
+              required: true,
               message: 'Vui lòng nhập phường xã',
             },
             () => ({
               validator(_, value) {
-                if (checkAddressExactly(name)) {
+                if (checkAddressExactly(fieldKey)) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
