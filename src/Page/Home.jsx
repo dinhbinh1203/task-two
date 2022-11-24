@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'antd/dist/antd.css';
 import '../index.css';
 import { Button, DatePicker, Form, Input, Row, Card } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import FormSelectTravel from '../Components/Form/FormSelectTravel';
+import FormTravel from '../Components/Form/FormTravel';
 
 const formItemLayout = {
   labelCol: {
@@ -33,6 +34,12 @@ const Home = () => {
     console.log('Received values of form: ', values);
   };
 
+  const onFinishFailed = ({ values, errorFields, outOfDate }) => {
+    console.log('travel', values.travel);
+    console.log('errorFields', errorFields);
+    console.log('outOfDate', outOfDate);
+  };
+
   const handleChangeDateOfBirth = (value) => {
     if (value !== null) {
       const yearCurrent = Number(moment().format('YYYY'));
@@ -53,18 +60,16 @@ const Home = () => {
   const onValuesChangeForm = (changedValues) => {
     let arrWard = [];
     const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
-
     if (fieldChange === 'travel') {
-      console.log('allValues.travel', changedValues, changedValues.travel);
+      // console.log('allValues.travel', changedValues, changedValues.travel);
       for (let i = 0; i < changedValues.travel.length; i++) {
         const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
-        console.log('validate after change===========', i, isTouchedWard);
+        // console.log('validate after change===========', i, isTouchedWard);
         if (isTouchedWard) {
           arrWard.push(['travel', i, 'ward']);
         }
       }
-
-      console.log('arrWard', arrWard);
+      // console.log('arrWard', arrWard);
       form.validateFields(arrWard);
     }
   };
@@ -105,6 +110,7 @@ const Home = () => {
             name="time_related_controls"
             {...formItemLayout}
             onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
@@ -168,7 +174,7 @@ const Home = () => {
                             form={form}
                             remove={remove}
                             fields={fields}
-                            // checkSubmit={checkSubmit}
+                            checkSubmit={checkSubmit}
                           />
                         );
                       })}

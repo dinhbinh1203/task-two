@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'antd/dist/antd.css';
 import cities from 'hanhchinhvn/dist/tinh_tp.json';
 import districts from 'hanhchinhvn/dist/quan_huyen.json';
@@ -36,22 +36,38 @@ const filterOption = (inputValue, option) => {
   );
 };
 
-const FormSelectTravel = ({ name, form, remove, fields, fieldKey }) => {
+const FormSelectTravel = ({
+  name,
+  form,
+  remove,
+  fields,
+  fieldKey,
+  checkSubmit,
+  field,
+}) => {
+  console.log(' field', field);
+
   const checkAddressExactly = (fieldKey) => {
+    console.log('check');
+    let check;
+    for (let j = 0; j < fields.length; j++) {
+      if (fields[j].fieldKey === fieldKey) {
+        check = j;
+      }
+    }
     for (let i = 0; i < fields.length; i++) {
       let { fieldKey: _fieldKey } = fields[i];
       if (
         fieldKey !== _fieldKey &&
-        form.getFieldValue(['travel', fieldKey, 'ward']) !== undefined &&
+        form.getFieldValue(['travel', check, 'ward']) !== undefined &&
         // eslint-disable-next-line no-self-compare
-        form.getFieldValue(['travel', _fieldKey, 'city']) ===
-          form.getFieldValue(['travel', fieldKey, 'city']) &&
-        form.getFieldValue(['travel', _fieldKey, 'district']) ===
-          form.getFieldValue(['travel', fieldKey, 'district']) &&
-        form.getFieldValue(['travel', _fieldKey, 'ward']) ===
-          form.getFieldValue(['travel', fieldKey, 'ward'])
+        form.getFieldValue(['travel', i, 'city']) ===
+          form.getFieldValue(['travel', check, 'city']) &&
+        form.getFieldValue(['travel', i, 'district']) ===
+          form.getFieldValue(['travel', check, 'district']) &&
+        form.getFieldValue(['travel', i, 'ward']) ===
+          form.getFieldValue(['travel', check, 'ward'])
       ) {
-        console.log('check exist travel', fieldKey, _fieldKey);
         return false;
       }
     }
@@ -89,7 +105,7 @@ const FormSelectTravel = ({ name, form, remove, fields, fieldKey }) => {
 
   const handleRemove = () => {
     remove(name);
-    console.log('onRemove', name, form.getFieldValue('travel'));
+    // console.log('onRemove', name, form.getFieldValue('travel'));
     // form.validateFields([['travel', name, 'ward']]);
   };
 
@@ -156,7 +172,7 @@ const FormSelectTravel = ({ name, form, remove, fields, fieldKey }) => {
 
       <Col span={7}>
         <Form.Item
-          dependencies={['district']}
+          dependencies={['travel']}
           name={[name, 'ward']}
           rules={[
             {
@@ -194,7 +210,9 @@ const FormSelectTravel = ({ name, form, remove, fields, fieldKey }) => {
       </Col>
 
       <Col span={3}>
-        {fields.length > 1 && <MinusCircleOutlined onClick={handleRemove} />}
+        {fields.length > 1 && (
+          <MinusCircleOutlined onClick={() => remove(name)} />
+        )}
       </Col>
     </Row>
   );
