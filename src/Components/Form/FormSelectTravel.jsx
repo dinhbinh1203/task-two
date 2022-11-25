@@ -76,11 +76,11 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
   };
 
   const handleCityChange = (value, option, name) => {
+    let currentDistrict = form.getFieldValue(['travel', name, 'district']);
     form.setFieldValue(['travel', name, 'district'], null);
     form.setFieldValue(['travel', name, 'ward'], null);
     onCallApiDistrict(option.compare);
 
-    let currentDistrict = form.getFieldValue(['travel', name, 'district']);
     validateFormList(form, currentDistrict ? name : undefined, true);
   };
 

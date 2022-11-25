@@ -28,8 +28,8 @@ export const validateFormList = (form, name, reValidate) => {
     if (name >= 0 && reValidate) {
       if (name === index) {
         if (item?.city) result.push(['travel', index, 'city']);
-        result.push(['travel', index, 'district']);
-        result.push(['travel', index, 'ward']);
+        // result.push(['travel', index, 'district']);
+        // result.push(['travel', index, 'ward']);
       } else {
         if (item?.city) result.push(['travel', index, 'city']);
         if (item?.district) result.push(['travel', index, 'district']);
@@ -77,6 +77,23 @@ const Home = () => {
     }
   };
 
+  const onValuesChangeForm = (changedValues) => {
+    let arrWard = [];
+    const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
+    if (fieldChange === 'travel') {
+      // console.log('allValues.travel', changedValues, changedValues.travel);
+      for (let i = 0; i < changedValues.travel.length; i++) {
+        const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
+        // console.log('validate after change===========', i, isTouchedWard);
+        if (isTouchedWard) {
+          arrWard.push(['travel', i, 'ward']);
+        }
+      }
+      // console.log('arrWard', arrWard);
+      form.validateFields(arrWard);
+    }
+  };
+
   return (
     <div
       className="site-card-border-less-wrapper"
@@ -107,6 +124,7 @@ const Home = () => {
             {...formItemLayout}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
+            onValuesChange={onValuesChangeForm}
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
