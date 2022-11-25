@@ -5,7 +5,6 @@ import { Button, DatePicker, Form, Input, Row, Card } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import FormSelectTravel from '../Components/Form/FormSelectTravel';
-import FormTravel from '../Components/Form/FormTravel';
 
 const formItemLayout = {
   labelCol: {
@@ -20,6 +19,33 @@ const formItemLayout = {
 
 const disabledDate = (current) => {
   return current > moment();
+};
+
+export const validateFormList = (form, name, reValidate) => {
+  let fields = form.getFieldValue('travel');
+
+  let fieldsWillValidate = fields.reduce((result, item, index) => {
+    if (name >= 0 && reValidate) {
+      if (name === index) {
+        if (item?.city) result.push(['travel', index, 'city']);
+        result.push(['travel', index, 'district']);
+        result.push(['travel', index, 'ward']);
+      } else {
+        if (item?.city) result.push(['travel', index, 'city']);
+        if (item?.district) result.push(['travel', index, 'district']);
+        if (item?.ward) result.push(['travel', index, 'ward']);
+      }
+    } else {
+      if (item?.city) result.push(['travel', index, 'city']);
+      if (item?.district) result.push(['travel', index, 'district']);
+      if (item?.ward) result.push(['travel', index, 'ward']);
+    }
+    return result;
+  }, []);
+
+  console.log('fieldsWillValidate', fieldsWillValidate);
+
+  form.validateFields(fieldsWillValidate);
 };
 
 const Home = () => {
@@ -49,36 +75,6 @@ const Home = () => {
     } else {
       form.setFieldValue('age', null);
     }
-  };
-
-  const [checkSubmit, setCheckSubmit] = useState(false);
-
-  const onClickSubmit = () => {
-    setCheckSubmit(true);
-  };
-
-  const onValuesChangeForm = (changedValues) => {
-    let arrWard = [];
-    const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
-    if (fieldChange === 'travel') {
-      // console.log('allValues.travel', changedValues, changedValues.travel);
-      for (let i = 0; i < changedValues.travel.length; i++) {
-        const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
-        // console.log('validate after change===========', i, isTouchedWard);
-        if (isTouchedWard) {
-          arrWard.push(['travel', i, 'ward']);
-        }
-      }
-      // console.log('arrWard', arrWard);
-      form.validateFields(arrWard);
-    }
-  };
-
-  const onFieldsChange = (changedFields, allFields) => {
-    // const travelField = changedFields[0].name[0];
-    // if (travelField === 'travel') {
-    //   console.log('fields change', changedFields, allFields);
-    // }
   };
 
   return (
@@ -114,8 +110,6 @@ const Home = () => {
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
-            onValuesChange={onValuesChangeForm}
-            onFieldsChange={onFieldsChange}
           >
             <Form.Item
               name="username"
@@ -160,12 +154,23 @@ const Home = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Địa điểm muốn du lịch" required>
-              <Form.List name="travel" initialValue={[{}]}>
+            <Form.Item label="Địa điểm muốn du lịch">
+              <Form.List
+                name="travel"
+                initialValue={[{}]}
+                rules={[
+                  () => ({
+                    validator(_, values) {
+                      validateFormList(form);
+                      return Promise.resolve();
+                    },
+                  }),
+                ]}
+              >
                 {(fields, { add, remove }) => {
                   return (
                     <>
-                      {fields.map(({ key, name }) => {
+                      {fields.map(({ key, name, isListField }) => {
                         return (
                           <FormSelectTravel
                             key={key}
@@ -174,7 +179,7 @@ const Home = () => {
                             form={form}
                             remove={remove}
                             fields={fields}
-                            checkSubmit={checkSubmit}
+                            isListField={isListField}
                           />
                         );
                       })}
@@ -202,7 +207,7 @@ const Home = () => {
                 justifyContent: 'center',
               }}
             >
-              <Button type="primary" htmlType="submit" onClick={onClickSubmit}>
+              <Button type="primary" htmlType="submit">
                 Submit
               </Button>
             </Form.Item>

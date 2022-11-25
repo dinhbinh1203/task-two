@@ -5,6 +5,7 @@ import districts from 'hanhchinhvn/dist/quan_huyen.json';
 import wards from 'hanhchinhvn/dist/xa_phuong.json';
 import { MinusCircleOutlined } from '@ant-design/icons';
 import { Form, Select, Row, Col } from 'antd';
+import { validateFormList } from '../../Page/Home';
 
 const { Option } = Select;
 
@@ -36,37 +37,19 @@ const filterOption = (inputValue, option) => {
   );
 };
 
-const FormSelectTravel = ({
-  name,
-  form,
-  remove,
-  fields,
-  fieldKey,
-  checkSubmit,
-  field,
-}) => {
-  console.log(' field', field);
-
-  const checkAddressExactly = (fieldKey) => {
-    console.log('check');
-    let check;
-    for (let j = 0; j < fields.length; j++) {
-      if (fields[j].fieldKey === fieldKey) {
-        check = j;
-      }
-    }
+const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
+  const checkAddressExactly = (name) => {
     for (let i = 0; i < fields.length; i++) {
-      let { fieldKey: _fieldKey } = fields[i];
       if (
-        fieldKey !== _fieldKey &&
-        form.getFieldValue(['travel', check, 'ward']) !== undefined &&
+        name !== i &&
+        form.getFieldValue(['travel', name, 'ward']) !== undefined &&
         // eslint-disable-next-line no-self-compare
         form.getFieldValue(['travel', i, 'city']) ===
-          form.getFieldValue(['travel', check, 'city']) &&
+          form.getFieldValue(['travel', name, 'city']) &&
         form.getFieldValue(['travel', i, 'district']) ===
-          form.getFieldValue(['travel', check, 'district']) &&
+          form.getFieldValue(['travel', name, 'district']) &&
         form.getFieldValue(['travel', i, 'ward']) ===
-          form.getFieldValue(['travel', check, 'ward'])
+          form.getFieldValue(['travel', name, 'ward'])
       ) {
         return false;
       }
@@ -93,26 +76,34 @@ const FormSelectTravel = ({
   };
 
   const handleCityChange = (value, option, name) => {
-    form.setFieldValue(['travel', name, 'district'], undefined);
-    form.setFieldValue(['travel', name, 'ward'], undefined);
+    form.setFieldValue(['travel', name, 'district'], null);
+    form.setFieldValue(['travel', name, 'ward'], null);
     onCallApiDistrict(option.compare);
+
+    let currentDistrict = form.getFieldValue(['travel', name, 'district']);
+    validateFormList(form, currentDistrict ? name : undefined, true);
   };
 
   const handleDistrictChange = (value, option, name) => {
-    form.setFieldValue(['travel', name, 'ward'], undefined);
+    let currentWard = form.getFieldValue(['travel', name, 'ward']);
+
+    form.setFieldValue(['travel', name, 'ward'], null);
     onCallApiWard(option.compare);
+
+    validateFormList(form, currentWard ? name : undefined, true);
   };
 
-  const handleRemove = () => {
-    remove(name);
-    // console.log('onRemove', name, form.getFieldValue('travel'));
-    // form.validateFields([['travel', name, 'ward']]);
+  const handleWardChange = (value, option, name) => {
+    // let currentWard = form.getFieldValue(['travel', name, 'ward']);
+    // console.log('currentWard', currentWard);
+    // validateFormList(form, currentWard ? name : undefined, true);
   };
 
   return (
     <Row gutter={16}>
       <Col span={7}>
         <Form.Item
+          isListField={isListField}
           name={[name, 'city']}
           rules={[
             {
@@ -140,6 +131,7 @@ const FormSelectTravel = ({
 
       <Col span={7}>
         <Form.Item
+          isListField={isListField}
           dependencies={['city']}
           name={[name, 'district']}
           rules={[
@@ -172,7 +164,8 @@ const FormSelectTravel = ({
 
       <Col span={7}>
         <Form.Item
-          dependencies={['travel']}
+          isListField={isListField}
+          dependencies={['district']}
           name={[name, 'ward']}
           rules={[
             {
@@ -181,7 +174,7 @@ const FormSelectTravel = ({
             },
             () => ({
               validator(_, value) {
-                if (checkAddressExactly(fieldKey)) {
+                if (checkAddressExactly(name)) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
@@ -198,6 +191,7 @@ const FormSelectTravel = ({
             filterOption={filterOption}
             placeholder="Phường/xã"
             disabled={!form.getFieldValue(['travel', name, 'district'])}
+            onChange={(value, option) => handleWardChange(value, option, name)}
           >
             {listWard !== undefined &&
               listWard.map((item) => (
