@@ -77,8 +77,8 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
 
   const handleCityChange = (value, option, name) => {
     let currentDistrict = form.getFieldValue(['travel', name, 'district']);
-    form.setFieldValue(['travel', name, 'district'], null);
-    form.setFieldValue(['travel', name, 'ward'], null);
+    form.setFieldValue(['travel', name, 'district'], undefined);
+    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiDistrict(option.compare);
 
     validateFormList(form, currentDistrict ? name : undefined, true);
@@ -87,16 +87,10 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
   const handleDistrictChange = (value, option, name) => {
     let currentWard = form.getFieldValue(['travel', name, 'ward']);
 
-    form.setFieldValue(['travel', name, 'ward'], null);
+    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiWard(option.compare);
 
     validateFormList(form, currentWard ? name : undefined, true);
-  };
-
-  const handleWardChange = (value, option, name) => {
-    // let currentWard = form.getFieldValue(['travel', name, 'ward']);
-    // console.log('currentWard', currentWard);
-    // validateFormList(form, currentWard ? name : undefined, true);
   };
 
   return (
@@ -191,7 +185,6 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
             filterOption={filterOption}
             placeholder="Phường/xã"
             disabled={!form.getFieldValue(['travel', name, 'district'])}
-            onChange={(value, option) => handleWardChange(value, option, name)}
           >
             {listWard !== undefined &&
               listWard.map((item) => (

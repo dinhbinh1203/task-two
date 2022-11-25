@@ -43,27 +43,22 @@ export const validateFormList = (form, name, reValidate) => {
     return result;
   }, []);
 
-  console.log('fieldsWillValidate', fieldsWillValidate);
-
   form.validateFields(fieldsWillValidate);
+  return true;
 };
 
 const Home = () => {
   const [form] = Form.useForm();
 
   const onFinish = (fieldsValue) => {
+    console.log('ok');
+
     form.resetFields();
     const values = {
       ...fieldsValue,
       dateOfBirth: fieldsValue['dateOfBirth'].format('DD-MM-YYYY'),
     };
     console.log('Received values of form: ', values);
-  };
-
-  const onFinishFailed = ({ values, errorFields, outOfDate }) => {
-    console.log('travel', values.travel);
-    console.log('errorFields', errorFields);
-    console.log('outOfDate', outOfDate);
   };
 
   const handleChangeDateOfBirth = (value) => {
@@ -81,15 +76,17 @@ const Home = () => {
     let arrWard = [];
     const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
     if (fieldChange === 'travel') {
-      // console.log('allValues.travel', changedValues, changedValues.travel);
       for (let i = 0; i < changedValues.travel.length; i++) {
         const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
-        // console.log('validate after change===========', i, isTouchedWard);
-        if (isTouchedWard) {
+
+        if (
+          isTouchedWard &&
+          form.getFieldValue(['travel', i, 'ward']) !== undefined
+        ) {
           arrWard.push(['travel', i, 'ward']);
         }
       }
-      // console.log('arrWard', arrWard);
+
       form.validateFields(arrWard);
     }
   };
@@ -123,7 +120,9 @@ const Home = () => {
             name="time_related_controls"
             {...formItemLayout}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            onFinishFailed={({ values, errorFields, outOfDate }) => {
+              console.log({ values, errorFields, outOfDate });
+            }}
             onValuesChange={onValuesChangeForm}
             form={form}
             labelCol={{ span: 8 }}
