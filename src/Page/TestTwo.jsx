@@ -4,7 +4,7 @@ import '../index.css';
 import { Button, DatePicker, Form, Input, Row, Card } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import FormSelectTravel from '../Components/Form/FormSelectTravel';
+import FormTest from '../Components/Form/FormTest';
 
 const formItemLayout = {
   labelCol: {
@@ -22,31 +22,30 @@ const disabledDate = (current) => {
 };
 
 export const validateFormList = (form, name, reValidate) => {
-  console.log('test 1');
-  let fields = form.getFieldValue('travel');
-  let fieldsWillValidate = fields.reduce((result, item, index) => {
-    if (name >= 0 && reValidate) {
-      if (name === index) {
-        if (item?.city) result.push(['travel', index, 'city']);
-        // result.push(['travel', index, 'district']);
-        // result.push(['travel', index, 'ward']);
-      } else {
-        if (item?.city) result.push(['travel', index, 'city']);
-        if (item?.district) result.push(['travel', index, 'district']);
-        if (item?.ward) result.push(['travel', index, 'ward']);
-      }
-    } else {
-      if (item?.city) result.push(['travel', index, 'city']);
-      if (item?.district) result.push(['travel', index, 'district']);
-      if (item?.ward) result.push(['travel', index, 'ward']);
-    }
-    return result;
-  }, []);
-  console.log('fieldsWillValidate 1', fieldsWillValidate);
-  form.validateFields(fieldsWillValidate);
+  // let fields = form.getFieldValue('travel');
+  // let fieldsWillValidate = fields.reduce((result, item, index) => {
+  //   if (name >= 0 && reValidate) {
+  //     if (name === index) {
+  //       if (item?.city) result.push(['travel', index, 'city']);
+  //       // result.push(['travel', index, 'district']);
+  //       // result.push(['travel', index, 'ward']);
+  //     } else {
+  //       if (item?.city) result.push(['travel', index, 'city']);
+  //       if (item?.district) result.push(['travel', index, 'district']);
+  //       if (item?.ward) result.push(['travel', index, 'ward']);
+  //     }
+  //   } else {
+  //     if (item?.city) result.push(['travel', index, 'city']);
+  //     if (item?.district) result.push(['travel', index, 'district']);
+  //     if (item?.ward) result.push(['travel', index, 'ward']);
+  //   }
+  //   return result;
+  // }, []);
+  // console.log('fieldsWillValidate', fieldsWillValidate);
+  // form.validateFields(fieldsWillValidate);
 };
 
-const Home = () => {
+const TestTwo = () => {
   const [form] = Form.useForm();
 
   const onFinish = (fieldsValue) => {
@@ -72,24 +71,20 @@ const Home = () => {
   };
 
   const onValuesChangeForm = (changedValues) => {
-    console.log('test 2');
-    let arrWard = [];
-    const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
-    if (fieldChange === 'travel') {
-      console.log('length', changedValues.travel.length);
-      for (let i = 0; i < changedValues.travel.length; i++) {
-        console.log('i', i);
-        const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
-        if (
-          isTouchedWard &&
-          form.getFieldValue(['travel', i, 'ward']) !== undefined
-        ) {
-          arrWard.push(['travel', i, 'ward']);
-        }
-      }
-      form.validateFields(arrWard);
-    }
-    console.log('arrWard', arrWard);
+    // let arrWard = [];
+    // const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
+    // if (fieldChange === 'travel') {
+    //   for (let i = 0; i < changedValues.travel.length; i++) {
+    //     const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
+    //     if (
+    //       isTouchedWard &&
+    //       form.getFieldValue(['travel', i, 'ward']) !== undefined
+    //     ) {
+    //       arrWard.push(['travel', i, 'ward']);
+    //     }
+    //   }
+    //   form.validateFields(arrWard);
+    // }
   };
 
   return (
@@ -190,7 +185,7 @@ const Home = () => {
                     <>
                       {fields.map(({ key, name, isListField }) => {
                         return (
-                          <FormSelectTravel
+                          <FormTest
                             key={key}
                             name={name}
                             fieldKey={key}
@@ -236,4 +231,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default TestTwo;
