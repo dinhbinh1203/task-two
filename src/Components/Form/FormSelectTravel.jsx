@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import cities from 'hanhchinhvn/dist/tinh_tp.json';
 import districts from 'hanhchinhvn/dist/quan_huyen.json';
 import wards from 'hanhchinhvn/dist/xa_phuong.json';
 import { MinusCircleOutlined } from '@ant-design/icons';
 import { Form, Select, Row, Col } from 'antd';
-import { validateFormList } from '../../Page/Home';
 
 const { Option } = Select;
 
@@ -35,6 +34,22 @@ const filterOption = (inputValue, option) => {
       removeVietnameseTones(inputValue.toLowerCase()),
     ) !== -1
   );
+};
+
+const onValuesChangeForm = (form, fields) => {
+  let arrWard = [];
+  fields.reduce((result, item, index) => {
+    const isTouchedWard = form.isFieldTouched(['travel', index, 'ward']);
+    if (
+      isTouchedWard &&
+      form.getFieldValue(['travel', index, 'ward']) !== undefined
+    ) {
+      arrWard.push(['travel', index, 'ward']);
+    }
+    return result;
+  }, []);
+
+  form.validateFields(arrWard);
 };
 
 const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
@@ -76,21 +91,26 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
   };
 
   const handleCityChange = (value, option, name) => {
-    let currentDistrict = form.getFieldValue(['travel', name, 'district']);
     form.setFieldValue(['travel', name, 'district'], undefined);
-    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiDistrict(option.compare);
+    onValuesChangeForm(form, form.getFieldValue('travel'));
 
-    validateFormList(form, currentDistrict ? name : undefined, true);
+    form.setFieldValue(['travel', name, 'ward'], undefined);
   };
 
   const handleDistrictChange = (value, option, name) => {
-    let currentWard = form.getFieldValue(['travel', name, 'ward']);
-
-    form.setFieldValue(['travel', name, 'ward'], undefined);
     onCallApiWard(option.compare);
+    onValuesChangeForm(form, form.getFieldValue('travel'));
+    form.setFieldValue(['travel', name, 'ward'], undefined);
+  };
 
-    validateFormList(form, currentWard ? name : undefined, true);
+  const handleWardChange = (value, option, name) => {
+    onValuesChangeForm(form, form.getFieldValue('travel'));
+  };
+
+  const handleRemove = () => {
+    onValuesChangeForm(form, form.getFieldValue('travel'));
+    remove(name);
   };
 
   return (
@@ -185,6 +205,7 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
             filterOption={filterOption}
             placeholder="Phường/xã"
             disabled={!form.getFieldValue(['travel', name, 'district'])}
+            onChange={(value, option) => handleWardChange(value, option, name)}
           >
             {listWard !== undefined &&
               listWard.map((item) => (
@@ -197,9 +218,7 @@ const FormSelectTravel = ({ name, form, remove, fields, isListField }) => {
       </Col>
 
       <Col span={3}>
-        {fields.length > 1 && (
-          <MinusCircleOutlined onClick={() => remove(name)} />
-        )}
+        {fields.length > 1 && <MinusCircleOutlined onClick={handleRemove} />}
       </Col>
     </Row>
   );

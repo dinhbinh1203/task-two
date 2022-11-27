@@ -21,41 +21,14 @@ const disabledDate = (current) => {
   return current > moment();
 };
 
-export const validateFormList = (form, name, reValidate) => {
-  console.log('test 1');
-  let fields = form.getFieldValue('travel');
-  let fieldsWillValidate = fields.reduce((result, item, index) => {
-    if (name >= 0 && reValidate) {
-      if (name === index) {
-        if (item?.city) result.push(['travel', index, 'city']);
-        // result.push(['travel', index, 'district']);
-        // result.push(['travel', index, 'ward']);
-      } else {
-        if (item?.city) result.push(['travel', index, 'city']);
-        if (item?.district) result.push(['travel', index, 'district']);
-        if (item?.ward) result.push(['travel', index, 'ward']);
-      }
-    } else {
-      if (item?.city) result.push(['travel', index, 'city']);
-      if (item?.district) result.push(['travel', index, 'district']);
-      if (item?.ward) result.push(['travel', index, 'ward']);
-    }
-    return result;
-  }, []);
-  console.log('fieldsWillValidate 1', fieldsWillValidate);
-  form.validateFields(fieldsWillValidate);
-};
-
 const Home = () => {
   const [form] = Form.useForm();
 
   const onFinish = (fieldsValue) => {
-    console.log('ok');
-
     form.resetFields();
     const values = {
       ...fieldsValue,
-      // dateOfBirth: fieldsValue['dateOfBirth'].format('DD-MM-YYYY'),
+      dateOfBirth: fieldsValue['dateOfBirth'].format('DD-MM-YYYY'),
     };
     console.log('Received values of form: ', values);
   };
@@ -69,27 +42,6 @@ const Home = () => {
     } else {
       form.setFieldValue('age', null);
     }
-  };
-
-  const onValuesChangeForm = (changedValues) => {
-    console.log('test 2');
-    let arrWard = [];
-    const fieldChange = Object.getOwnPropertyNames(changedValues)[0];
-    if (fieldChange === 'travel') {
-      console.log('length', changedValues.travel.length);
-      for (let i = 0; i < changedValues.travel.length; i++) {
-        console.log('i', i);
-        const isTouchedWard = form.isFieldTouched(['travel', i, 'ward']);
-        if (
-          isTouchedWard &&
-          form.getFieldValue(['travel', i, 'ward']) !== undefined
-        ) {
-          arrWard.push(['travel', i, 'ward']);
-        }
-      }
-      form.validateFields(arrWard);
-    }
-    console.log('arrWard', arrWard);
   };
 
   return (
@@ -124,7 +76,6 @@ const Home = () => {
             onFinishFailed={({ values, errorFields, outOfDate }) => {
               console.log({ values, errorFields, outOfDate });
             }}
-            onValuesChange={onValuesChangeForm}
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
@@ -173,18 +124,7 @@ const Home = () => {
             </Form.Item>
 
             <Form.Item label="Địa điểm muốn du lịch">
-              <Form.List
-                name="travel"
-                initialValue={[{}]}
-                rules={[
-                  () => ({
-                    validator(_, values) {
-                      validateFormList(form);
-                      return Promise.resolve();
-                    },
-                  }),
-                ]}
-              >
+              <Form.List name="travel" initialValue={[{}]}>
                 {(fields, { add, remove }) => {
                   return (
                     <>
