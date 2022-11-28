@@ -4,3 +4,7 @@
   border: 0;
   font-size: 100%;
 }
+
+.w-full {
+  width: 100%;
+}
